@@ -82,7 +82,7 @@
                 </div>
             </div>
             <div class="card-footer">
-                <o-button variant="primary" @click="setAppointment(), activeModal = false">Confirmar</o-button>
+                <o-button variant="primary" @click="setAppointment()">Confirmar</o-button>
                 <o-button variant="danger" @click="activeModal = false">Cancelar</o-button>
             </div>
         </div>
@@ -186,6 +186,16 @@ const calendarOptions = {
 }
 
 async function setAppointment() {
+    activeModal.value = false
+    Swal.fire({
+        icon: 'info',
+        title:'Generando Cita...',
+        allowOutsideClick:false,
+        showConfirmButton:false,
+        didOpen: () => {
+            Swal.showLoading()
+        }
+    });
     const event = {
         start: moment(`${selectedDate.value.date} ${selectedDate.value.timeStart}`).tz("UTC").format('Y-MM-DD HH:mm'),
         end: moment(`${selectedDate.value.date} ${selectedDate.value.timeEnd}`).tz("UTC").format('Y-MM-DD HH:mm'),
@@ -203,10 +213,17 @@ async function setAppointment() {
         console.log(calendarEL.value);
         const cal = calendarEL.value.calendar
         cal.refetchEvents();
-        
+
         console.log(cal);
 
+    } else {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Ocurrió un problema',
+            timer: 2000
+        })
     }
+
 
 }
 
