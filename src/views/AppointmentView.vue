@@ -5,15 +5,15 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-4">
             <div class="form-group">
                 <o-field label="Usuario">
-                    <o-input></o-input>
+                    <o-input v-model="store.user.name" readonly></o-input>
                 </o-field>
             </div>
             <div class="form-group">
                 <o-field label="Correo">
-                    <o-input></o-input>
+                    <o-input v-model="store.user.email" readonly></o-input>
                 </o-field>
             </div>
             <div class="text-center d-none d-md-block">
@@ -23,8 +23,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-9">
-            <FullCalendar :options="calendarOptions" />
+        <div class="col-12 col-md-8">
+            <FullCalendar ref="calendarEL" :options="calendarOptions" />
         </div>
         <div class="col-12 text-center d-md-none">
             <img src="../assets/images/doc.png" alt="" class="w-75">
@@ -76,12 +76,13 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        <p><span class="fw-bold">¿Seguro de Confirmar la Cita?</span> Una vez realizada la acción no se podrá deshacer.</p>
+                        <p><span class="fw-bold">¿Seguro de Confirmar la Cita?</span> Una vez realizada la acción no se
+                            podrá deshacer.</p>
                     </div>
                 </div>
             </div>
             <div class="card-footer">
-                <o-button variant="primary" @click="store.confirmAppointment(),activeModal = false">Confirmar</o-button>
+                <o-button variant="primary" @click="setAppointment(), activeModal = false">Confirmar</o-button>
                 <o-button variant="danger" @click="activeModal = false">Cancelar</o-button>
             </div>
         </div>
@@ -94,11 +95,24 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import TimeGridPlugin from '@fullcalendar/timegrid'
 import esLocale from '@fullcalendar/core/locales/es'
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 
-import {useMainStore} from '../stores/mainStore'
+import { useMainStore } from '../stores/mainStore'
 
 import moment from 'moment'
+
+import { useRouter } from 'vue-router'
+
+import Swal from 'sweetalert2'
+
+const router = useRouter()
+
+onBeforeMount(() => {
+    if (!store.user.name) {
+        router.replace('/');
+    }
+})
+
 
 const store = useMainStore();
 
@@ -110,6 +124,7 @@ const selectedDate = ref({
     timeEnd: ""
 });
 
+const calendarEL = ref();
 
 const calendarOptions = {
     plugins: [dayGridPlugin, interactionPlugin, TimeGridPlugin],
@@ -127,8 +142,8 @@ const calendarOptions = {
             }
         }
     },
-    height:'auto',
-    editable: true,
+    // height: 'auto',
+
     selectable: true,
     unselectAuto: true,
     selectConstraint: "businessHours",
@@ -166,7 +181,33 @@ const calendarOptions = {
         selectedDate.value.timeStart = moment(arg.start).format('HH:mm')
         selectedDate.value.timeEnd = moment(arg.start).add(30, 'm').format('HH:mm')
         activeModal.value = true;
+    },
+    events: store.getAppointments
+}
+
+async function setAppointment() {
+    const event = {
+        start: moment(`${selectedDate.value.date} ${selectedDate.value.timeStart}`).tz("UTC").format('Y-MM-DD HH:mm'),
+        end: moment(`${selectedDate.value.date} ${selectedDate.value.timeEnd}`).tz("UTC").format('Y-MM-DD HH:mm'),
+        user: store.user.name,
+        email: store.user.email
     }
+    const result = await store.setAppointment(event)
+
+    if (result.code == 200) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Cita Agendada!',
+            timer: 2000,
+        });
+        console.log(calendarEL.value);
+        const cal = calendarEL.value.calendar
+        cal.refetchEvents();
+        
+        console.log(cal);
+
+    }
+
 }
 
 </script>

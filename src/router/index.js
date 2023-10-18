@@ -10,11 +10,14 @@ const router = createRouter({
       component: CheckUser
     },
     {
-      path:"/agenda",
-      name:"appointment",
-      component: Appointment
+      path: "/agenda",
+      name: "appointment",
+      component: Appointment,
+      // beforeEnter: (to, from) => {
+        
+      //   return false
+      // }
     }
-    
   ]
 })
 

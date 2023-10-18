@@ -17,6 +17,7 @@
     "@oruga-ui/theme-bootstrap": "^0.4.0",
     "axios": "^1.5.1",
     "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
     "pinia": "^2.1.6",
     "sweetalert2": "^11.7.32",
     "vue": "^3.3.4",

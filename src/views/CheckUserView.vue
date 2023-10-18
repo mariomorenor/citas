@@ -19,15 +19,24 @@
 import { ref } from 'vue';
 import { useMainStore } from '../stores/mainStore';
 import { useRouter } from 'vue-router';
-
+import Swal from 'sweetalert2'
 const store = useMainStore();
 const router = useRouter();
 
 const dni = ref("");
 
 async function checkUser() {
-    const result = await store.checkUser(dni);
-    if (result) {
+    const result = await store.checkUser(dni.value);
+    if (result.code == 404) {
+        
+        Swal.fire({
+            icon: 'error',
+            title:'Usuario no existe',
+            text:'Si cree que se trata de un error, si es empleado comuníquese con la dirección administrativa y si es estudiante con la dirección de estudiantes '
+        });
+    }
+    
+    if (result.code == 200) {
         router.replace("/agenda")
     }
 }
