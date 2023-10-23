@@ -8,7 +8,7 @@ import { RouterView } from 'vue-router'
       <div class="card-body">
         <div class="row">
           <div class="col-12 col-lg-6 mx-auto">
-            <img class="w-100" src="./assets/images/Logo PUCESD.png" alt="">
+            <img class="w-100" src="./assets/images/LogoPUCESD.png" alt="">
           </div>
         </div>
         <RouterView />
